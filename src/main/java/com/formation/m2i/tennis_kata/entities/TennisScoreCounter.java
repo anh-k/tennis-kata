@@ -37,33 +37,67 @@ public class TennisScoreCounter {
         return new Game(playerOne, playerTwo);
     }
 
+    public String getScore() {
+        if (isDeuce())
+            return "Deuce";
+
+        if (isAdvantage()) {
+            return "Advantage to " + highestScorePlayer();
+        }
+
+        if (isWon()) {
+            String result = highestScorePlayer() + " has won";
+            this.scoreOne = 0;
+            this.scoreTwo = 0;
+            return result;
+        }
+
+        return "PlayerOne has " + scoreToString(scoreOne) + ", " + "PlayerTwo has " + scoreToString(scoreTwo);
+    }
+
     public String notifyPlayersPoint(Player player) {
-        scoreAPoint(player);
         return player.getName() + " has scored a point";
     }
 
     public void scoreAPoint(Player player) {
         if (player.getName().equals("PlayerOne")) {
-            this.scoreOne = givePointsToPlayer(scoreOne);
+            scoreOne++;
         } else {
-            this.scoreTwo = givePointsToPlayer(scoreTwo);
+            scoreTwo++;
         }
     }
 
-    public Integer givePointsToPlayer(Integer score) {
+    public String scoreToString(Integer score) {
         return switch (score) {
-            case 0 -> 15;
-            case 15 -> 30;
-            case 30 -> 40;
-            case 40 -> giveAdvantage();
-            default -> 0;
+            case 1 -> "15";
+            case 2 -> "30";
+            case 3 -> "40";
+            default -> "0";
         };
     }
 
-    public Integer giveAdvantage() {
-        if (scoreOne.equals(scoreTwo)) {
-            return 1;
-        } else return 0;
+    private boolean isAdvantage() {
+        if (scoreOne >= 4 && scoreOne == scoreTwo + 1)
+            return true;
+        return scoreTwo >= 4 && scoreTwo == scoreOne + 1;
+    }
+
+    private boolean isWon() {
+        if (scoreOne >= 4 && scoreOne >= scoreTwo + 2)
+            return true;
+        return scoreTwo >= 4 && scoreTwo >= scoreOne + 2;
+    }
+
+    private boolean isDeuce() {
+        return scoreOne >= 3 && scoreTwo.equals(scoreOne);
+    }
+
+    private String highestScorePlayer() {
+        if (scoreOne > scoreTwo) {
+            return "PlayerOne";
+        } else {
+            return "PlayerTwo";
+        }
     }
 
 }

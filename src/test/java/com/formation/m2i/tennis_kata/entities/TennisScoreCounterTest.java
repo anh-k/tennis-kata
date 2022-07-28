@@ -67,17 +67,58 @@ class TennisScoreCounterTest {
     @Test
     @DisplayName("player score a point")
     void player_score_a_point() {
-        counter.notifyPlayersPoint(playerOne);
-        assertThat(counter.getScoreOne()).isEqualTo(15);
-        counter.notifyPlayersPoint(playerOne);
-        assertThat(counter.getScoreOne()).isEqualTo(30);
-        counter.notifyPlayersPoint(playerOne);
-        assertThat(counter.getScoreOne()).isEqualTo(40);
-        counter.notifyPlayersPoint(playerTwo);
-        assertThat(counter.getScoreTwo()).isEqualTo(15);
-        counter.notifyPlayersPoint(playerTwo);
-        assertThat(counter.getScoreTwo()).isEqualTo(30);
-        counter.notifyPlayersPoint(playerTwo);
-        assertThat(counter.getScoreTwo()).isEqualTo(40);
+        counter.scoreAPoint(playerOne);
+        assertThat(counter.getScoreOne()).isEqualTo(1);
+        counter.scoreAPoint(playerOne);
+        assertThat(counter.getScoreOne()).isEqualTo(2);
+        counter.scoreAPoint(playerOne);
+        assertThat(counter.getScoreOne()).isEqualTo(3);
+        counter.scoreAPoint(playerTwo);
+        assertThat(counter.getScoreTwo()).isEqualTo(1);
+        counter.scoreAPoint(playerTwo);
+        assertThat(counter.getScoreTwo()).isEqualTo(2);
+        counter.scoreAPoint(playerTwo);
+        assertThat(counter.getScoreTwo()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("give advantage to player")
+    void give_advantage_to_player() {
+        for (int i = 0; i < 3; i++) {
+            counter.scoreAPoint(playerOne);
+            counter.scoreAPoint(playerTwo);
+        }
+        assertThat(counter.getScore()).isEqualTo("Deuce");
+        counter.scoreAPoint(playerOne);
+        assertThat(counter.getScore()).isEqualTo("Advantage to PlayerOne");
+        counter.scoreAPoint(playerTwo);
+        assertThat(counter.getScore()).isEqualTo("Deuce");
+        counter.scoreAPoint(playerTwo);
+        assertThat(counter.getScore()).isEqualTo("Advantage to PlayerTwo");
+    }
+
+    @Test
+    @DisplayName("give win to player")
+    void give_win_to_player() {
+        for (int i = 0; i < 3; i++) {
+            counter.scoreAPoint(playerOne);
+            counter.scoreAPoint(playerTwo);
+        }
+        assertThat(counter.getScore()).isEqualTo("Deuce");
+        counter.scoreAPoint(playerOne);
+        assertThat(counter.getScore()).isEqualTo("Advantage to PlayerOne");
+        counter.scoreAPoint(playerOne);
+        assertThat(counter.getScore()).isEqualTo("PlayerOne has won");
+    }
+
+    @Test
+    @DisplayName("reset scores")
+    void reset_scores() {
+        for (int i = 0; i < 4; i++) {
+            counter.scoreAPoint(playerOne);
+        }
+        counter.getScore();
+        assertThat(counter.getScoreOne()).isEqualTo(0);
+        assertThat(counter.getScoreTwo()).isEqualTo(0);
     }
 }
