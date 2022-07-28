@@ -11,6 +11,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TennisScoreCounter {
 
+    private Player matchWinner;
+
+    @Builder.Default
+    private Player playerOne = new Player("PlayerOne");
+
+    @Builder.Default
+    private Player playerTwo =  new Player("PlayerTwo");
+
     @Builder.Default
     private Integer scoreOne = 0;
 
@@ -24,6 +32,12 @@ public class TennisScoreCounter {
     private Integer playerTwoWin = 0;
 
     @Builder.Default
+    private Integer playerOneSets = 0;
+
+    @Builder.Default
+    private Integer playerTwoSets = 0;
+
+    @Builder.Default
     private Integer advantageOne = 0;
 
     @Builder.Default
@@ -34,25 +48,29 @@ public class TennisScoreCounter {
     }
 
     public Game createAGameWithPlayers(Player playerOne, Player playerTwo) {
+        this.playerOne = playerOne;
+        this.playerTwo = playerTwo;
         return new Game(playerOne, playerTwo);
     }
 
     public String getScore() {
+        Player highestScorePlayer = highestScorePlayer();
+
         if (isDeuce())
             return "Deuce";
 
         if (isAdvantage()) {
-            return "Advantage to " + highestScorePlayer();
+            return "Advantage to " + highestScorePlayer.getName();
         }
 
-        if (isWon()) {
-            String result = highestScorePlayer() + " has won";
+        if (isWonGame()) {
+            winGame(highestScorePlayer);
             this.scoreOne = 0;
             this.scoreTwo = 0;
-            return result;
+            return highestScorePlayer.getName() + " has won";
         }
 
-        return "PlayerOne has " + scoreToString(scoreOne) + ", " + "PlayerTwo has " + scoreToString(scoreTwo);
+        return playerOne.getName() + " has " + scoreToString(scoreOne) + ", " + playerTwo.getName() + " has " + scoreToString(scoreTwo);
     }
 
     public String notifyPlayersPoint(Player player) {
@@ -60,7 +78,7 @@ public class TennisScoreCounter {
     }
 
     public void scoreAPoint(Player player) {
-        if (player.getName().equals("PlayerOne")) {
+        if (player.getName().equals(playerOne.getName())) {
             scoreOne++;
         } else {
             scoreTwo++;
@@ -82,7 +100,7 @@ public class TennisScoreCounter {
         return scoreTwo >= 4 && scoreTwo == scoreOne + 1;
     }
 
-    private boolean isWon() {
+    private boolean isWonGame() {
         if (scoreOne >= 4 && scoreOne >= scoreTwo + 2)
             return true;
         return scoreTwo >= 4 && scoreTwo >= scoreOne + 2;
@@ -92,12 +110,41 @@ public class TennisScoreCounter {
         return scoreOne >= 3 && scoreTwo.equals(scoreOne);
     }
 
-    private String highestScorePlayer() {
+    private Player highestScorePlayer() {
         if (scoreOne > scoreTwo) {
-            return "PlayerOne";
+            return playerOne;
         } else {
-            return "PlayerTwo";
+            return playerTwo;
         }
     }
 
+    private void winGame(Player player) {
+        if (player.getName().equals(playerOne.getName())) {
+            playerOneWin++;
+            if (playerOneWin >= 6 && playerTwoWin <= 4) {
+                winSet(player);
+            }
+        } else {
+            playerTwoWin++;
+            if (playerTwoWin >= 6 && playerOneWin <= 4) {
+                winSet(player);
+            }
+        }
+    }
+
+    private void winSet(Player player) {
+        if (player.getName().equals(playerOne.getName())) {
+            playerOneSets++;
+        } else {
+            playerTwoSets++;
+        }
+
+        if (playerOneSets == 2 || playerTwoSets == 2)
+            winMatch(player);
+    }
+
+    private String winMatch(Player player) {
+        matchWinner = player;
+        return player + " win match !";
+    }
 }
