@@ -10,14 +10,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TennisScoreCounter {
-
     private Player matchWinner;
 
     @Builder.Default
     private Player playerOne = new Player("PlayerOne");
 
     @Builder.Default
-    private Player playerTwo =  new Player("PlayerTwo");
+    private Player playerTwo = new Player("PlayerTwo");
 
     @Builder.Default
     private Integer scoreOne = 0;
@@ -26,10 +25,10 @@ public class TennisScoreCounter {
     private Integer scoreTwo = 0;
 
     @Builder.Default
-    private Integer playerOneWin = 0;
+    private Integer playerOneWinGame = 0;
 
     @Builder.Default
-    private Integer playerTwoWin = 0;
+    private Integer playerTwoWinGame = 0;
 
     @Builder.Default
     private Integer playerOneSets = 0;
@@ -42,6 +41,9 @@ public class TennisScoreCounter {
 
     @Builder.Default
     private Integer advantageTwo = 0;
+
+    @Builder.Default
+    private boolean isDecisive = false;
 
     public Game createAGame() {
         return new Game();
@@ -67,7 +69,7 @@ public class TennisScoreCounter {
             winGame(highestScorePlayer);
             this.scoreOne = 0;
             this.scoreTwo = 0;
-            return highestScorePlayer.getName() + " has won";
+            return highestScorePlayer.getName() + " has won the game";
         }
 
         return playerOne.getName() + " has " + scoreToString(scoreOne) + ", " + playerTwo.getName() + " has " + scoreToString(scoreTwo);
@@ -120,13 +122,13 @@ public class TennisScoreCounter {
 
     private void winGame(Player player) {
         if (player.getName().equals(playerOne.getName())) {
-            playerOneWin++;
-            if (playerOneWin >= 6 && playerTwoWin <= 4) {
+            playerOneWinGame++;
+            if ((playerOneWinGame >= 6 && playerTwoWinGame <= 4) || winSetWithAdvantage()) {
                 winSet(player);
             }
         } else {
-            playerTwoWin++;
-            if (playerTwoWin >= 6 && playerOneWin <= 4) {
+            playerTwoWinGame++;
+            if ((playerTwoWinGame >= 6 && playerOneWinGame <= 4) || winSetWithAdvantage()) {
                 winSet(player);
             }
         }
@@ -145,6 +147,12 @@ public class TennisScoreCounter {
 
     private String winMatch(Player player) {
         matchWinner = player;
-        return player + " win match !";
+        return player.getName() + " win match !";
+    }
+
+    public boolean winSetWithAdvantage() {
+        if (playerOneWinGame >= 5 && playerOneWinGame >= playerTwoWinGame + 2)
+            return true;
+        return playerTwoWinGame >= 5 && playerTwoWinGame >= playerOneWinGame + 2;
     }
 }
